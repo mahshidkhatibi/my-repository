@@ -1,0 +1,340 @@
+<meta name='viewport' content='width=device-width, initial-scale=1'/><!DOCTYPE html>
+<html lang="fa" dir="rtl"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>بازی الگوها</title>
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#eef6c4;--card:#fffef5;--ink:#1f2a5c;--soft:#e6eaff;--c1:#fff;--c2:#eef0ff;--ok:#1f9d5c;--bad:#d8453b;--hi:#ffe97a;--arc:#2fa86b;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#171c3a;--card:#222a54;--ink:#f1f3ff;--soft:#323b72;--c1:#2a3263;--c2:#344078;--hi:#6d5f16}}
+:root[data-theme="dark"]{--bg:#171c3a;--card:#222a54;--ink:#f1f3ff;--soft:#323b72;--c1:#2a3263;--c2:#344078;--hi:#6d5f16}
+*,*::before,*::after{box-sizing:inherit}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:Vazirmatn,Tahoma,sans-serif;line-height:1.7;min-height:100%}
+.wrap{max-width:560px;margin:0 auto;padding:14px 12px 30px}
+header{background:var(--hi);border:3px dashed var(--ink);border-radius:22px;padding:8px 14px;display:flex;justify-content:space-between;align-items:center;gap:8px}
+#who{font-size:18px;margin:0;font-weight:800;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#stars{font-weight:800;font-size:18px;white-space:nowrap}
+.btn{font:inherit;font-weight:700;border:3px solid var(--ink);background:var(--card);color:var(--ink);border-radius:16px;padding:8px 14px;cursor:pointer}
+.btn.main{background:var(--ink);color:var(--card)}
+button:focus-visible,input:focus-visible,.cell:focus-visible{outline:4px solid #f26a1b;outline-offset:2px}
+.card{background:var(--card);border:3px dashed var(--ink);border-radius:26px;padding:16px 12px;margin-top:12px}
+h2{margin:0 0 4px;font-size:19px}
+p.lead{margin:0 0 12px;font-size:15px}
+.dots{display:flex;gap:6px;margin-bottom:10px}
+.dots i{flex:1;height:12px;border-radius:8px;border:2px solid var(--ink);display:block}
+.dots i.on{background:var(--ok);border-color:var(--ok)}.dots i.cur{background:var(--hi)}
+.figs{display:flex;direction:ltr;justify-content:center;align-items:flex-end;gap:14px;flex-wrap:wrap;margin:6px 0 12px;min-height:90px}
+.fig{display:flex;flex-direction:column;align-items:center;gap:2px}
+.fig small{font-size:12px}
+.svgbox.q{width:58px;height:58px;border:3px dashed var(--ink);border-radius:12px;display:grid;place-items:center;font-size:28px;font-weight:800}
+.board{display:flex;justify-content:center;margin:6px 0}
+.grid{display:grid;direction:ltr;gap:0;border:3px solid var(--ink);border-radius:8px;overflow:hidden}
+.cell{position:relative;width:var(--cs);height:var(--cs);border:0;padding:0;background:var(--c1);cursor:pointer}
+.cell.alt{background:var(--c2)}
+.cell::after{content:"";position:absolute;inset:3px;border-radius:6px;background:var(--c);transform:scale(0);transition:transform .14s}
+.circ .cell::after{border-radius:50%}
+.cell.ghost::after{transform:scale(1);opacity:.28}
+.cell.ans{box-shadow:inset 0 0 0 3px #f26a1b;animation:blink 1.1s infinite}
+.cell.ans::after{transform:scale(1);opacity:.35}
+.cell.on::after{transform:scale(1);opacity:1}
+svg.tri{width:100%;max-width:300px;height:auto;touch-action:manipulation}
+svg.tri polygon{fill:var(--c1);stroke:var(--ink);stroke-width:2;cursor:pointer;stroke-linejoin:round}
+svg.tri polygon.ghost{fill:var(--c);fill-opacity:.3}
+svg.tri polygon.ans{stroke:#f26a1b;stroke-width:4;fill:var(--c);fill-opacity:.3;animation:blink 1.1s infinite}
+svg.tri polygon.on{fill:var(--c);fill-opacity:1}
+.cnt{text-align:center;font-weight:700;margin:6px 0}
+.row{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:10px}
+.msg{min-height:30px;text-align:center;font-weight:700;margin-top:10px;padding:0 6px}
+.msg.ok{color:var(--ok);animation:pop .4s}.msg.bad{color:var(--bad)}
+.hintbox{background:var(--soft);border-radius:14px;padding:8px 12px;margin-top:10px;font-size:14px;text-align:center}
+.hintbox p{margin:2px 0}
+.seq{display:flex;direction:ltr;justify-content:center;align-items:center;margin:26px 0 22px}
+.nb{width:min(50px,11.5vw);height:min(56px,13vw);border:3px solid var(--ink);border-radius:12px;background:var(--c1);color:var(--ink);font:800 min(22px,5vw) Vazirmatn,Tahoma,sans-serif;text-align:center;padding:0;display:grid;place-items:center}
+input.nb{background:var(--hi);border-style:dashed}
+input.nb.ok{background:var(--ok);color:#fff;border-style:solid}
+input.nb.bad{border-color:var(--bad);animation:sh .3s}
+.arc{width:min(26px,4.6vw);height:16px;border:3px solid var(--arc);border-top:0;border-radius:0 0 40px 40px;position:relative;margin-top:30px}
+.arc i{position:absolute;top:16px;left:50%;transform:translateX(-50%);font-style:normal;font-size:12px;font-weight:700;white-space:nowrap;visibility:hidden;color:var(--ink)}
+.seq.show .arc i{visibility:visible}
+.credit{text-align:center;font-size:12.5px;margin-top:16px;opacity:.85}
+@keyframes sh{25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+@keyframes pop{50%{transform:scale(1.25)}}
+@keyframes blink{50%{opacity:.55}}
+[hidden]{display:none!important}
+
+/* full-screen pages: start + result */
+.screen{position:fixed;inset:0;z-index:5;overflow:auto;background:linear-gradient(160deg,#ffd3e6 0%,#ffe9a8 38%,#c8f0d4 70%,#c9d7ff 100%);color:#2a2a6a;display:flex;align-items:center;justify-content:center;padding:calc(16px + env(safe-area-inset-top,0px)) 14px calc(16px + env(safe-area-inset-bottom,0px))}
+#start{background:url("https://i.ibb.co/jpGYDtK/In-Shot-20261009-061109337.jpg") center/cover no-repeat,linear-gradient(160deg,#ffd3e6 0%,#ffe9a8 38%,#c8f0d4 70%,#c9d7ff 100%)}
+.mute,.peek{position:fixed;bottom:calc(12px + env(safe-area-inset-bottom,0px));left:12px;z-index:20;width:48px;height:48px;border-radius:50%;border:3px solid #2a2a6a;background:#fff;color:#2a2a6a;font-size:22px;cursor:pointer;box-shadow:0 3px 0 #2a2a6a;padding:0}
+#start .hero{background:rgba(255,255,255,.28);-webkit-backdrop-filter:none;backdrop-filter:none;transition:opacity .25s}
+#start .hero .sub,#start .hero .credit{text-shadow:0 0 6px #fff,0 0 3px #fff}
+#start.peek .hero{opacity:0;pointer-events:none}
+.peek{right:12px;left:auto}
+#tm{font-weight:800;font-size:16px;white-space:nowrap}
+.fl{position:absolute;bottom:-60px;opacity:.4;animation:rise linear infinite;pointer-events:none;user-select:none;filter:drop-shadow(0 0 8px #fff)}
+@keyframes rise{0%{transform:translate(0,0) rotate(0)}50%{transform:translate(24px,-60vh) rotate(25deg)}100%{transform:translate(-10px,-125vh) rotate(-15deg)}}
+.hero{position:relative;z-index:1;width:100%;max-width:480px;text-align:center;background:rgba(255,255,255,.55);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);border:3px dashed #2a2a6a;border-radius:34px;padding:20px 14px 16px}
+.hero h1{font-size:clamp(34px,10vw,52px);font-weight:900;line-height:1.2;margin:0;color:#c2185b;text-shadow:3px 3px 0 #fff}
+.hero .sub{font-weight:700;font-size:16px;margin:4px 0 8px}
+.shapes{display:flex;direction:ltr;justify-content:center;align-items:flex-end;gap:12px;flex-wrap:wrap;margin:8px 0 12px}
+.shapes>div{animation:bob 2.4s ease-in-out infinite}
+.shapes>div:nth-child(2){animation-delay:.3s}.shapes>div:nth-child(3){animation-delay:.6s}.shapes>div:nth-child(4){animation-delay:.9s}
+@keyframes bob{50%{transform:translateY(-9px)}}
+.about{display:grid;gap:6px;text-align:right;font-size:14.5px;margin:0 0 12px}
+.about div{background:rgba(255,255,255,.7);border-radius:16px;padding:6px 12px}
+.name{width:min(300px,100%);font:700 18px Vazirmatn,Tahoma,sans-serif;text-align:center;padding:9px 12px;border:3px solid #2a2a6a;border-radius:18px;background:#fff;color:#2a2a6a}
+.big{font:inherit;font-weight:800;font-size:21px;border:3px solid #2a2a6a;border-radius:22px;padding:10px 22px;cursor:pointer;width:min(300px,100%);color:#fff;background:#7c4dff;box-shadow:0 5px 0 #2a2a6a;margin-top:10px}
+.big.alt{background:#f26a1b;font-size:17px}
+.big:active{transform:translateY(4px);box-shadow:0 1px 0 #2a2a6a}
+.hero .credit{font-weight:700;font-size:14px;margin-top:16px;opacity:1;line-height:1.9}
+.stbig{font-size:46px;font-weight:900;margin:6px 0}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.fl{display:none}}
+</style></head><body>
+
+<audio id="bgm" loop preload="auto" src="https://irsv.upmusics.com/Downloads/Musics/Pat%20O%20Mat%201%20(128).mp3"></audio>
+<button class="mute" id="mute" aria-label="قطع و وصل موسیقی">🔇</button>
+<button class="mute peek" id="peek" aria-label="دیدن عکس زمینه">🖼</button>
+
+<div class="screen" id="start">
+<div id="fl1"></div>
+<div class="hero">
+<h1>بازی الگوها</h1>
+<div class="sub">ریاضی پایه سوم دبستان</div>
+<div class="shapes" id="shapes"></div>
+<div class="about">
+<div>🔷 <b>الگوی شکلی:</b> شکل‌ها را ببین و شکل بعدی را روی خانه‌ها بساز.</div>
+<div>🔢 <b>الگوی عددی:</b> عددها را ببین و دو عدد بعدی را بنویس.</div>
+</div>
+<input class="name" id="nm" maxlength="20" placeholder="نام و نام خانوادگی" autocomplete="off" aria-label="نام دانش‌آموز">
+<div class="msg" id="nmerr" style="min-height:24px;margin-top:4px;color:#c2185b"></div>
+<button class="big" id="go">شروع بازی 🚀</button>
+<div class="credit">طراح: مهشید خطیبی<br>مدرسه فاطمه مادر سیدمحمود</div>
+</div></div>
+
+<div class="wrap" id="app" hidden>
+<header><span id="who"></span><span id="tm">⏱ ۰۰:۰۰</span><span id="stars" aria-live="polite">⭐ ۰</span></header>
+<section id="shape" class="card" hidden>
+<div class="dots" id="sdots"></div>
+<h2 id="stitle"></h2>
+<p class="lead">شکل‌ها را ببین. شکل چهارم را با ضربه زدن روی خانه‌ها بساز.</p>
+<div class="figs" id="figs"></div>
+<div class="board" id="board"></div>
+<div class="cnt" id="cnt"></div>
+<div class="hintbox" id="shint" hidden></div>
+<div class="msg" id="smsg" role="status"></div>
+<div class="row">
+<button class="btn main" id="scheck">بررسی کن</button>
+<button class="btn" id="sclear">پاک کن</button>
+<button class="btn" id="shbtn">راهنما</button>
+<button class="btn main" id="snext" hidden>ادامه</button></div>
+</section>
+
+<section id="num" class="card" hidden>
+<div class="dots" id="ndots"></div>
+<h2 id="ntitle"></h2>
+<p class="lead" id="nlead"></p>
+<div class="seq" id="seq"></div>
+<div class="hintbox" id="nhint" hidden></div>
+<div class="msg" id="nmsg" role="status"></div>
+<div class="row">
+<button class="btn main" id="ncheck">بررسی کن</button>
+<button class="btn" id="nhbtn">راهنما</button>
+<button class="btn main" id="nnext" hidden>ادامه</button></div>
+</section>
+<div class="credit">طراح: مهشید خطیبی -- مدرسه فاطمه مادر سیدمحمود</div>
+</div>
+
+<div class="screen" id="res" hidden>
+<div id="fl2"></div>
+<div class="hero">
+<div class="stbig" id="rstars"></div>
+<h1 id="rtitle" style="font-size:clamp(28px,8vw,40px)"></h1>
+<p id="rtime" style="font-weight:800;font-size:19px;margin:6px 0"></p>
+<p id="rtext" style="font-weight:700;font-size:16px"></p>
+<button class="big" id="again">بازی دوباره 🔁</button>
+<button class="big alt" id="first">صفحه اول</button>
+<div class="credit">طراح: مهشید خطیبی<br>مدرسه فاطمه مادر سیدمحمود</div>
+</div></div>
+
+<script>
+const fa=n=>String(n).replace(/\d/g,d=>'۰۱۲۳۴۵۶۷۸۹'[d]);
+const en=s=>s.replace(/[۰-۹]/g,d=>'۰۱۲۳۴۵۶۷۸۹'.indexOf(d)).replace(/[٠-٩]/g,d=>'٠١٢٣٤٥٦٧٨٩'.indexOf(d)).replace(/\D/g,'');
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const rnd=(a,b)=>a+Math.floor(Math.random()*(b-a+1)),pick=a=>a[rnd(0,a.length-1)];
+const shuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=rnd(0,i);[a[i],a[j]]=[a[j],a[i]]}return a};
+let stars=0,name='',step=0,run=null,lastIds=[];
+const addStars=n=>{stars+=n;$('#stars').textContent='⭐ '+fa(stars)};
+function msg(id,t,c){const e=$(id);e.textContent=t;e.className='msg '+(c||'')}
+const dots=(el,i)=>$(el).innerHTML=Array.from({length:4},(_,k)=>`<i class="${k<i?'on':k==i?'cur':''}"></i>`).join('');
+
+/* ---------- shape pattern bank ---------- */
+function triPolys(rows,s){const h=s*.866,x0=rows*s/2,o=[];
+ for(let r=0;r<rows;r++){const y=r*h,x=k=>x0+(2*k-r)*s/2;
+  for(let k=0;k<=r;k++){
+   o.push({key:r+','+2*k,pts:`${x(k)},${y} ${x(k)-s/2},${y+h} ${x(k)+s/2},${y+h}`});
+   if(k<r)o.push({key:r+','+(2*k+1),pts:`${x(k)},${y} ${x(k+1)},${y} ${x(k)+s/2},${y+h}`});}}
+ return o}
+const DEF=[
+{id:'stairs',rows:5,cols:5,off:[0,0],fig:n=>{const a=[];for(let r=0;r<n;r++)for(let c=0;c<=r;c++)a.push([r,c]);return a}},
+{id:'tri',tri:1,off:[0,0],fig:n=>triPolys(n,1).map(o=>o.key)},
+{id:'plus',rows:7,cols:7,off:[1,1],fig:n=>{const m=n-1,a=[[m,m]];for(let k=1;k<n;k++)a.push([m-k,m],[m+k,m],[m,m-k],[m,m+k]);return a}},
+{id:'arms',rows:7,cols:4,off:[1,0],fig:n=>{const m=n-1,a=[[m,0]];for(let k=1;k<n;k++)a.push([m,k],[m-k,0],[m+k,0]);return a}},
+{id:'sqr',rows:5,cols:5,off:[0,0],fig:n=>{const a=[];for(let r=0;r<n;r++)for(let c=0;c<n;c++)a.push([r,c]);return a}},
+{id:'ell',rows:5,cols:5,off:[0,0],fig:n=>{const a=[];for(let c=0;c<n;c++)a.push([0,c]);for(let r=1;r<n;r++)a.push([r,0]);return a}}];
+const COL=['#5b4fc4','#f26a1b','#2fa86b','#6b6df0','#e91e63','#00a3c4','#b8860b'];
+const cnt=(p,n)=>p.fig(n).length;
+function figSVG(p,n,z=1){
+ if(p.kind=='tri'){const s=15*z,h=s*.866;return `<svg width="${n*s}" height="${n*h}">${triPolys(n,s).map(o=>`<polygon points="${o.pts}" fill="${p.color}" stroke="#fff" stroke-width="1"/>`).join('')}</svg>`}
+ const cs=16*z,a=p.fig(n),R=Math.max(...a.map(x=>x[0]))+1,C=Math.max(...a.map(x=>x[1]))+1;
+ return `<svg width="${C*cs}" height="${R*cs}">${a.map(([r,c])=>p.kind=='circ'?`<circle cx="${c*cs+cs/2}" cy="${r*cs+cs/2}" r="${cs/2-1}" fill="${p.color}"/>`:`<rect x="${c*cs+1}" y="${r*cs+1}" width="${cs-2}" height="${cs-2}" rx="${2*z}" fill="${p.color}"/>`).join('')}</svg>`}
+
+/* ---------- number pattern generator ---------- */
+function gen(l){
+ if(l==1){const st=pick([2,3,5,10]),up=Math.random()<.5;let s=up?rnd(0,200-5*st):rnd(5*st,200);
+  if(st>=5)s-=s%st;const d=up?st:-st;return {seq:Array.from({length:6},(_,i)=>s+d*i),diffs:Array(5).fill(d)}}
+ const [d0,inc]=pick([[2,2],[3,2],[1,2],[4,2],[5,2],[1,1],[2,1],[3,1]]),s=rnd(0,100),diffs=Array.from({length:5},(_,i)=>d0+inc*i),seq=[s];
+ diffs.forEach(d=>seq.push(seq[seq.length-1]+d));return {seq,diffs}}
+
+/* ---------- a new run: 2 shape + 2 number patterns ---------- */
+function newRun(){
+ let pool=DEF.filter(d=>!lastIds.includes(d.id));if(pool.length<2)pool=DEF;
+ const ds=shuffle(pool).slice(0,2),cs=shuffle(COL).slice(0,2);lastIds=ds.map(d=>d.id);
+ run={shapes:ds.map((d,i)=>({...d,kind:d.tri?'tri':pick(['sq','circ']),color:cs[i]})),nums:[gen(1),gen(2)]};
+ stars=0;addStars(0)}
+
+/* ---------- timer + navigation ---------- */
+let t0=0,tid=null;
+const two=n=>fa(String(n).padStart(2,'0'));
+function tick(){const s=Math.floor((Date.now()-t0)/1000);$('#tm').textContent='⏱ '+two(Math.floor(s/60))+':'+two(s%60)}
+function startTimer(){t0=Date.now();clearInterval(tid);tick();tid=setInterval(tick,1000)}
+function go(s){
+ step=s;if(s==0)clearInterval(tid);$('#peek').hidden=s!=0;if(s!=0)$('#start').classList.remove('peek');
+ $('#start').hidden=s!=0;$('#res').hidden=s!=5;$('#app').hidden=s<1||s>4;
+ $('#shape').hidden=!(s==1||s==2);$('#num').hidden=!(s==3||s==4);
+ if(s==1||s==2)loadShape(s-1);if(s==3||s==4)loadNum(s-3);
+ if(s==5)showResult();scrollTo(0,0)}
+function showResult(){
+ clearInterval(tid);const sec=Math.floor((Date.now()-t0)/1000),mn=Math.floor(sec/60),sc=sec%60;
+ $('#rtime').textContent='⏱ زمان بازی: '+(mn?fa(mn)+' دقیقه و ':'')+fa(sc)+' ثانیه';
+ const t=stars;$('#rstars').textContent='⭐'.repeat(Math.max(1,Math.ceil(t/2)))+(t==0?'💪':'');
+ $('#rtitle').textContent=(t>=7?'عالی بود، ':t>=4?'آفرین، ':'دمت گرم، ')+name+'!';
+ $('#rtext').textContent=`تو ${fa(t)} ستاره از ${fa(8)} ستاره گرفتی. ${t>=7?'الگوها را خیلی خوب پیدا کردی 🏆':'با تمرین بیشتر، الگوها را بهتر پیدا می‌کنی 🌱'}`}
+
+/* ---------- shape page ---------- */
+let sp,lit=new Set(),sdone=false,stries=0,shint=0;
+function loadShape(i){
+ const p=sp=run.shapes[i];lit=new Set();sdone=false;stries=0;shint=0;
+ dots('#sdots',step-1);
+ $('#stitle').textContent=`الگوی شکلی ${fa(i+1)} از ۲`;
+ $('#figs').innerHTML=[1,2,3].map(n=>`<div class="fig"><div>${figSVG(p,n)}</div><small>شکل ${fa(n)}</small></div>`).join('')+`<div class="fig"><div class="svgbox q">؟</div><small>شکل ۴</small></div>`;
+ const b=$('#board');
+ if(p.kind=='tri'){const s=52,rows=5;b.innerHTML=`<svg class="tri" viewBox="0 0 ${rows*s} ${rows*s*.866}" style="--c:${p.color}">${triPolys(rows,s).map(o=>`<polygon data-k="${o.key}" points="${o.pts}"/>`).join('')}</svg>`}
+ else{let h=`<div class="grid ${p.kind}" style="--c:${p.color};--cs:min(46px,calc((100vw - 90px)/${p.cols}));grid-template-columns:repeat(${p.cols},var(--cs))">`;
+  for(let r=0;r<p.rows;r++)for(let c=0;c<p.cols;c++)h+=`<button class="cell${(r+c)%2?' alt':''}" data-k="${r},${c}" aria-label="خانه ${fa(r+1)}، ${fa(c+1)}" aria-pressed="false"></button>`;
+  b.innerHTML=h+'</div>'}
+ $('#shint').hidden=true;$('#shbtn').textContent='راهنما';$('#shbtn').disabled=false;msg('#smsg','');upd();
+ $('#snext').hidden=true;['#scheck','#sclear','#shbtn'].forEach(x=>$(x).hidden=false)}
+function upd(){$('#cnt').textContent='خانه‌های روشن: '+fa(lit.size)}
+$('#board').addEventListener('click',e=>{
+ const t=e.target.closest('[data-k]');if(!t||sdone)return;const k=t.dataset.k;
+ lit.has(k)?lit.delete(k):lit.add(k);
+ const on=lit.has(k);t.classList.toggle('on',on);t.setAttribute('aria-pressed',on);upd();msg('#smsg','')});
+const norm=a=>{const q=[...a].map(s=>s.split(',').map(Number)),r=Math.min(...q.map(x=>x[0])),c=Math.min(...q.map(x=>x[1]));return q.map(x=>(x[0]-r)+','+(x[1]-c)).sort().join('|')};
+const keys=(p,n)=>p.kind=='tri'?p.fig(n):p.fig(n).map(([r,c])=>(r+p.off[0]*(n==3?1:0))+','+(c+p.off[1]*(n==3?1:0)));
+function same(p){const t=p.fig(4);
+ if(p.kind=='tri')return lit.size==t.length&&t.every(k=>lit.has(k));
+ return lit.size==t.length&&norm(lit)==norm(t.map(x=>x.join(',')))}
+const mark=(ks,c)=>ks.forEach(k=>{const e=$(`#board [data-k="${k}"]`);if(e)e.classList.add(c)});
+/* hint stages: 1 counts, 2 faded previous figure, 3 answer cells */
+function setHint(s){
+ if(s<=shint)return;shint=s;const p=sp,c=[1,2,3,4].map(n=>cnt(p,n)),box=$('#shint');box.hidden=false;
+ let h=`<p>تعداد خانه‌ها: ${c.slice(0,3).map(fa).join(' ، ')} -- اول ${fa(c[1]-c[0])} تا اضافه شد، بعد ${fa(c[2]-c[1])} تا. شکل چهارم چند تا اضافه می‌شود؟</p>`;
+ if(s>=2){mark(keys(p,3),'ghost');h+=`<p>شکل ۳ را کم‌رنگ روی صفحه گذاشتم. حالا فقط خانه‌های تازه را اضافه کن.</p>`}
+ if(s>=3){const g=new Set(keys(p,3)),all=p.kind=='tri'?p.fig(4):p.fig(4).map(x=>x.join(','));
+  mark(all.filter(k=>!g.has(k)),'ans');
+  h+=`<p>جواب: ${fa(c[3]-c[2])} خانه‌ی تازه (با کادر نارنجی چشمک‌زن) به شکل ۳ اضافه می‌شود. روی همه‌ی خانه‌ها بزن تا شکل ۴ ساخته شود.</p>`}
+ box.innerHTML=h;
+ $('#shbtn').textContent=s==1?'راهنمای بیشتر':s==2?'جواب را نشان بده':'جواب نشان داده شد';
+ $('#shbtn').disabled=s>=3}
+$('#shbtn').onclick=()=>setHint(shint+1);
+$('#scheck').onclick=()=>{
+ const p=sp,t=p.fig(4).length;if(!lit.size){msg('#smsg','اول چند خانه را روشن کن.','bad');return}
+ if(same(p)){sdone=true;addStars(stries||shint?1:2);
+  $$('#board .ghost,#board .ans').forEach(e=>e.classList.remove('ghost','ans'));
+  msg('#smsg','آفرین! شکل چهارم درست ساخته شد 🎉','ok');
+  $('#snext').hidden=false;['#scheck','#sclear','#shbtn'].forEach(x=>$(x).hidden=true)}
+ else{stries++;
+  const m=lit.size<t?'هنوز خانه‌های روشن کمتر از لازم است.':lit.size>t?'خانه‌های روشن بیشتر از لازم است.':'تعداد خانه‌ها درست است، اما جای بعضی خانه‌ها درست نیست.';
+  const need=stries>=4?3:stries>=3?2:stries>=2?1:0;
+  msg('#smsg',m+(need>shint?' راهنما را برایت باز کردم 💡':''),'bad');
+  if(need>shint)setHint(need)}};
+$('#sclear').onclick=()=>{lit=new Set();$$('#board [data-k]').forEach(e=>{e.classList.remove('on');e.setAttribute('aria-pressed','false')});upd();msg('#smsg','')};
+$('#snext').onclick=()=>go(step+1);
+
+/* ---------- number page ---------- */
+let ndone=false,ntries=0,nh=0,cur;
+function loadNum(k){
+ ndone=false;ntries=0;nh=0;cur=run.nums[k];const lv=k+1;
+ dots('#ndots',step-1);
+ $('#ntitle').textContent=`الگوی عددی ${fa(k+1)} از ۲`;
+ $('#nlead').textContent=lv==1?'عددها هر بار به یک اندازه زیاد یا کم می‌شوند. دو عدد بعدی را بنویس.':'اندازه‌ی تغییر هر بار فرق می‌کند. الگو را پیدا کن و دو عدد بعدی را بنویس.';
+ const f=d=>(d>0?'+':'−')+fa(Math.abs(d));let h='';
+ cur.seq.forEach((v,i)=>{
+  h+=i<4?`<div class="nb">${fa(v)}</div>`:`<input class="nb" inputmode="numeric" maxlength="3" autocomplete="off" aria-label="عدد ${fa(i+1)}">`;
+  if(i<5)h+=`<span class="arc"><i>${f(cur.diffs[i])}</i></span>`});
+ const q=$('#seq');q.innerHTML=h;q.classList.remove('show');
+ $('#nhint').hidden=true;$('#nhbtn').textContent='راهنما';
+ msg('#nmsg','');$('#nnext').hidden=true;$('#ncheck').hidden=false;$('#nhbtn').hidden=false;
+ $('#nnext').textContent=step==4?'دیدن نتیجه':'ادامه';
+ $$('#seq input').forEach(e=>{e.oninput=()=>{e.value=fa(en(e.value).slice(0,3));e.classList.remove('bad')};
+  e.onkeydown=ev=>{if(ev.key=='Enter')$('#ncheck').click()}})}
+/* hint stages: 1 arcs, 2 explanation, 3 reveal answer */
+function setNH(s){
+ if(s<=nh||ndone)return;nh=s;const d=cur.diffs,up=d[0]>0,box=$('#nhint'),lv1=step==3;
+ if(s>=1)$('#seq').classList.add('show');
+ if(s>=2){box.hidden=false;
+  box.textContent=lv1?`هر بار ${fa(Math.abs(d[0]))} تا ${up?'زیاد':'کم'} می‌شود. از ${fa(cur.seq[3])} شروع کن و ${fa(Math.abs(d[3]))} تا ${up?'زیاد':'کم'} کن.`
+   :`اندازه‌ی اضافه‌شدن‌ها: ${d.slice(0,3).map(fa).join('، ')}. هر بار ${fa(d[1]-d[0])} تا بیشتر می‌شود؛ پس بعدی ${fa(d[3])} تا اضافه می‌شود: ${fa(cur.seq[3])} + ${fa(d[3])}`}
+ if(s>=3){$$('#seq input').forEach((e,i)=>{e.value=fa(cur.seq[4+i]);e.readOnly=true;e.className='nb ok'});
+  ndone=true;box.hidden=false;
+  box.textContent=`جواب: ${fa(cur.seq[4])} و ${fa(cur.seq[5])}. در بازی بعدی دوباره امتحان کن، می‌توانی!`;
+  msg('#nmsg','جواب نشان داده شد 💪','ok');
+  $('#nnext').hidden=false;$('#ncheck').hidden=true;$('#nhbtn').hidden=true}
+ $('#nhbtn').textContent=s==1?'راهنمای بیشتر':'جواب را نشان بده'}
+$('#nhbtn').onclick=()=>setNH(nh+1);
+$('#ncheck').onclick=()=>{
+ const ins=$$('#seq input');let ok=0,empty=false;
+ ins.forEach((e,i)=>{const v=en(e.value);if(v==='')empty=true;
+  const g=v!==''&&+v==cur.seq[4+i];e.classList.toggle('ok',g);e.classList.toggle('bad',!g&&v!=='');if(g)ok++});
+ if(empty&&ok<2){msg('#nmsg','هر دو عدد را بنویس.','bad');return}
+ if(ok==2){ndone=true;ins.forEach(e=>e.readOnly=true);
+  addStars(ntries||nh?1:2);$('#seq').classList.add('show');
+  msg('#nmsg','درست است! 🎉','ok');
+  $('#nnext').hidden=false;$('#ncheck').hidden=true;$('#nhbtn').hidden=true}
+ else{ntries++;
+  const need=ntries>=4?3:ntries>=3?2:ntries>=2?1:0;
+  msg('#nmsg',(ok==1?'یکی از عددها درست است. دوباره امتحان کن.':'دوباره امتحان کن.')+(need>nh?' راهنما را برایت باز کردم 💡':''),'bad');
+  if(need>nh)setNH(need)}};
+$('#nnext').onclick=()=>go(step+1);
+
+/* ---------- start / result pages ---------- */
+const ch=['❤','💗','🌸','🌼','🌷','💜','🌺','💖','⭐'];
+const fl=(el,c)=>$(el).innerHTML=Array.from({length:22},()=>`<span class="fl" style="left:${rnd(0,95)}%;font-size:${rnd(18,44)}px;animation-duration:${rnd(10,20)}s;animation-delay:-${rnd(0,18)}s">${pick(c)}</span>`).join('');
+fl('#fl1',ch);fl('#fl2',['🎉','⭐','🌟','💖','🌸','✨']);
+$('#shapes').innerHTML=[0,1,2,3].map(i=>`<div>${figSVG({...DEF[[0,1,2,3][i]],kind:i==1?'tri':i==3?'circ':'sq',color:COL[[0,2,1,3][i]]},3,1.5)}</div>`).join('');
+
+/* ---------- background music ---------- */
+const bgm=$('#bgm');let userMuted=false;bgm.volume=.5;
+const icon=()=>$('#mute').textContent=bgm.paused?'🔇':'🔊';
+bgm.addEventListener('play',icon);bgm.addEventListener('pause',icon);
+$('#mute').onclick=()=>{if(bgm.paused){userMuted=false;bgm.play().catch(()=>{})}else{userMuted=true;bgm.pause()}};
+
+function begin(){
+ name=$('#nm').value.trim();
+ if(!name){$('#nmerr').textContent='اول نامت را بنویس 😊';$('#nm').focus();return}
+ $('#nmerr').textContent='';$('#who').textContent='سلام، '+name+' 👋';if(!userMuted)bgm.play().catch(()=>{});newRun();startTimer();go(1)}
+$('#go').onclick=begin;$('#nm').onkeydown=e=>{if(e.key=='Enter')begin()};
+$('#again').onclick=()=>{newRun();startTimer();go(1)};
+$('#peek').onclick=()=>$('#start').classList.toggle('peek');
+$('#first').onclick=()=>go(0);
+</script></body></html>
